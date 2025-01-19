@@ -7,7 +7,7 @@ export async function GET() {
         // Ambil user pertama sebagai default untuk halaman portfolio
         const user = await prisma.user.findFirst({
             where: {
-                role: 'STAFF' // atau kriteria lain
+                role: 'SUPER_ADMIN' // atau kriteria lain
             },
             select: {
                 id: true,

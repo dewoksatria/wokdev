@@ -12,6 +12,15 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      animation: {
+        'flicker': 'flicker 0.15s infinite alternate',
+      },
+      keyframes: {
+        flicker: {
+          '0%': { opacity: '0.1' },
+          '100%': { opacity: '0.2' },
+        },
+      },
     },
   },
   plugins: [],
