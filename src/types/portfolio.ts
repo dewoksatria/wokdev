@@ -8,6 +8,7 @@ export interface Experience {
     endDate?: Date | null;
     current: boolean;
     description?: string | null;
+    image: string | null;
     userId: string;
     createdAt: Date;
     updatedAt: Date;

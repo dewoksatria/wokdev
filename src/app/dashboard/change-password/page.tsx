@@ -2,9 +2,16 @@
 'use client'
 
 import React from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function ChangePasswordPage() {
+
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+    const [showNewPassword, setShowNewPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
     const [formData, setFormData] = React.useState({
         currentPassword: '',
         newPassword: '',
@@ -63,7 +70,7 @@ export default function ChangePasswordPage() {
                 setError(data.error)
             }
         } catch (err) {
-            setError('Terjadi kesalahan saat mengubah password')
+            setError('Terjadi kesalahan saat mengubah password ' + err)
         } finally {
             setIsLoading(false)
         }
@@ -93,48 +100,89 @@ export default function ChangePasswordPage() {
                         <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
                             Password Saat Ini
                         </label>
-                        <input
-                            type="password"
-                            name="currentPassword"
-                            id="currentPassword"
-                            required
-                            value={formData.currentPassword}
-                            onChange={handleChange}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            disabled={isLoading}
-                        />
+                        <div className="relative mt-1">
+                            <input
+                                type={showCurrentPassword ? 'text' : 'password'}
+                                name="currentPassword"
+                                id="currentPassword"
+                                required
+                                value={formData.currentPassword}
+                                onChange={handleChange}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm pr-10"
+                                disabled={isLoading}
+                            />
+                            <button
+                                type="button"
+                                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            >
+                                {showCurrentPassword ? (
+                                    <EyeOff className="h-5 w-5 text-gray-400" />
+                                ) : (
+                                    <Eye className="h-5 w-5 text-gray-400" />
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     <div>
                         <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
                             Password Baru
                         </label>
-                        <input
-                            type="password"
-                            name="newPassword"
-                            id="newPassword"
-                            required
-                            value={formData.newPassword}
-                            onChange={handleChange}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            disabled={isLoading}
-                        />
+                        <div className="relative mt-1">
+                            <input
+                                type={showNewPassword ? 'text' : 'password'}
+                                name="newPassword"
+                                id="newPassword"
+                                required
+                                value={formData.newPassword}
+                                onChange={handleChange}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm pr-10"
+                                disabled={isLoading}
+                            />
+                            <button
+                                type="button"
+                                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                            >
+                                {showCurrentPassword ? (
+                                    <EyeOff className="h-5 w-5 text-gray-400" />
+                                ) : (
+                                    <Eye className="h-5 w-5 text-gray-400" />
+                                )}
+                            </button>
+                        </div>
+
                     </div>
 
                     <div>
                         <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                             Konfirmasi Password Baru
                         </label>
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            id="confirmPassword"
-                            required
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            disabled={isLoading}
-                        />
+                        <div className="relative mt-1">
+                            <input
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                name="confirmPassword"
+                                id="confirmPassword"
+                                required
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm pr-10"
+                                disabled={isLoading}
+                            />
+                            <button
+                                type="button"
+                                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                                {showCurrentPassword ? (
+                                    <EyeOff className="h-5 w-5 text-gray-400" />
+                                ) : (
+                                    <Eye className="h-5 w-5 text-gray-400" />
+                                )}
+                            </button>
+                        </div>
+
                     </div>
 
                     <div className="flex justify-end space-x-3">

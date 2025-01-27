@@ -1,67 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { Edit, Trash2, Calendar, Building, MapPin } from 'lucide-react';
+import { Edit, Trash2, Building, MapPin } from 'lucide-react';
 import { Alert } from '@/components/ui/Alert';
+import { Skill } from '@/types/portfolio'
 
-interface Experience {
-    id: string;
-    title: string;
-    company: string;
-    location: string;
-    startDate: string;
-    endDate: string | null;
-    current: boolean;
-    description: string;
-}
 
-const ExperienceList = () => {
-    const [experiences, setExperiences] = useState<Experience[]>([]);
+
+const SkillList = () => {
+    const [skills, setSkills] = useState<Skill[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        fetchExperiences();
+        fetchSkills();
     }, []);
 
-    const fetchExperiences = async () => {
+    const fetchSkills = async () => {
         try {
-            const res = await fetch('/api/portfolio/experience');
-            if (!res.ok) throw new Error('Failed to fetch experiences');
+            const res = await fetch('/api/portfolio/skill');
+            if (!res.ok) throw new Error('Failed to fetch skills');
             const data = await res.json();
-            setExperiences(data.experiences);
+            setSkills(data.skills);
         } catch (err) {
             console.log(err)
-            setError('Gagal memuat data pengalaman kerja');
+            setError('Gagal memuat data skill');
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Apakah Anda yakin ingin menghapus pengalaman ini?')) return;
+        if (!confirm('Apakah Anda yakin ingin menghapus skill ini?')) return;
 
         try {
-            const res = await fetch('/api/portfolio/experience', {
+            const res = await fetch('/api/portfolio/skill', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id }),
             });
 
             if (res.ok) {
-                setExperiences(prev => prev.filter(exp => exp.id !== id));
+                setSkills(prev => prev.filter(exp => exp.id !== id));
             } else {
-                throw new Error('Failed to delete experience');
+                throw new Error('Failed to delete skill');
             }
         } catch (err) {
             console.log(err)
-            setError('Gagal menghapus pengalaman kerja');
+            setError('Gagal menghapus skill');
         }
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('id-ID', {
-            year: 'numeric',
-            month: 'long',
-        });
     };
 
     if (isLoading) {
@@ -80,7 +65,7 @@ const ExperienceList = () => {
         );
     }
 
-    if (experiences.length === 0) {
+    if (skills.length === 0) {
         return (
             <div className="text-center py-8 bg-gray-50 rounded-lg">
                 <p className="text-gray-500">Belum ada pengalaman kerja yang ditambahkan</p>
@@ -90,29 +75,22 @@ const ExperienceList = () => {
 
     return (
         <div className="space-y-6">
-            {experiences.map((experience) => (
-                <div key={experience.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            {skills.map((skill) => (
+                <div key={skill.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h3 className="text-xl font-semibold text-gray-900">{experience.title}</h3>
+                            <h3 className="text-xl font-semibold text-gray-900">{skill.name}</h3>
                             <div className="mt-2 space-y-2">
                                 <div className="flex items-center text-gray-600">
                                     <Building className="h-4 w-4 mr-2" />
-                                    <span>{experience.company}</span>
+                                    <span>{skill.level}</span>
                                 </div>
-                                {experience.location && (
+                                {skill.category && (
                                     <div className="flex items-center text-gray-600">
                                         <MapPin className="h-4 w-4 mr-2" />
-                                        <span>{experience.location}</span>
+                                        <span>{skill.category}</span>
                                     </div>
                                 )}
-                                <div className="flex items-center text-gray-600">
-                                    <Calendar className="h-4 w-4 mr-2" />
-                                    <span>
-                                        {formatDate(experience.startDate)} -{' '}
-                                        {experience.current ? 'Sekarang' : experience.endDate ? formatDate(experience.endDate) : ''}
-                                    </span>
-                                </div>
                             </div>
                         </div>
                         <div className="flex space-x-2">
@@ -124,21 +102,16 @@ const ExperienceList = () => {
                             </button>
                             <button
                                 className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                                onClick={() => handleDelete(experience.id)}
+                                onClick={() => handleDelete(skill.id)}
                             >
                                 <Trash2 className="h-5 w-5" />
                             </button>
                         </div>
                     </div>
-                    {experience.description && (
-                        <div className="mt-4 text-gray-700">
-                            <p className="whitespace-pre-line">{experience.description}</p>
-                        </div>
-                    )}
                 </div>
             ))}
         </div>
     );
 };
 
-export default ExperienceList;
+export default SkillList;
