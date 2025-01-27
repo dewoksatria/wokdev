@@ -2,8 +2,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Calendar, Link2 } from 'lucide-react'
+import { Calendar, Link2, Upload } from 'lucide-react'
 import type { ProjectFormData } from '@/types'
+import Image from 'next/image'
 
 interface ProjectFormProps {
     onSuccess?: () => void
@@ -13,14 +14,17 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
     const [formData, setFormData] = useState<ProjectFormData>({
         title: '',
         description: '',
+        image: null,
         link: '',
         githubUrl: '',
         startDate: '',
+        endDate: '',
         technologies: [],
     })
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [preview, setPreview] = useState<string>('')
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
@@ -28,6 +32,14 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
             ...prev,
             [name]: value
         }))
+    }
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            setFormData(prev => ({ ...prev, image: file }))
+            setPreview(URL.createObjectURL(file))
+        }
     }
 
     const handleTechnologies = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,10 +57,18 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
         setIsLoading(true)
 
         try {
+            const formDataToSend = new FormData()
+            Object.entries(formData).forEach(([key, value]) => {
+                if (key === 'technologies') {
+                    formDataToSend.append(key, JSON.stringify(value))
+                } else if (value !== null && value !== '') {
+                    formDataToSend.append(key, value)
+                }
+            })
+
             const res = await fetch('/api/portfolio/project', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: formDataToSend,
             })
 
             const data = await res.json()
@@ -58,11 +78,14 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                 setFormData({
                     title: '',
                     description: '',
+                    image: null,
                     link: '',
                     githubUrl: '',
                     startDate: '',
+                    endDate: '',
                     technologies: [],
                 })
+                setPreview('')
                 onSuccess?.()
             } else {
                 setError(data.error)
@@ -94,6 +117,39 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                             <p className="text-sm text-green-700">{success}</p>
                         </div>
                     )}
+
+                    {/* Image Upload */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Project Image
+                        </label>
+                        <div className="mt-2 flex items-center space-x-6">
+                            <div className="relative w-64 h-40 border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-100">
+                                {preview ? (
+                                    <Image
+                                        src={preview}
+                                        alt="Project preview"
+                                        fill
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <div className="h-full w-full flex items-center justify-center">
+                                        <Upload className="h-8 w-8 text-gray-400" />
+                                    </div>
+                                )}
+                            </div>
+                            <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+                                <Upload className="h-5 w-5 mr-2" />
+                                Upload Image
+                                <input
+                                    type="file"
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                />
+                            </label>
+                        </div>
+                    </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
@@ -169,6 +225,25 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                                 type="date"
                                 name="startDate"
                                 value={formData.startDate}
+                                onChange={handleChange}
+                                required
+                                className="block w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            />
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Calendar className="h-4 w-4 text-gray-400" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Tanggal Selesai
+                        </label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input
+                                type="date"
+                                name="endDate"
+                                value={formData.endDate}
                                 onChange={handleChange}
                                 required
                                 className="block w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"

@@ -13,7 +13,8 @@ import {
     Link as LinkIcon,
     Settings,
     User,
-    Contact
+    Contact,
+    FileText
 } from 'lucide-react'
 import type { User as UserType } from '@/types'
 
@@ -39,6 +40,11 @@ const sidebarLinks = [
                 name: 'Skills',
                 href: '/dashboard/skills',
                 icon: Code2
+            },
+            {
+                name: 'Articles',
+                href: '/dashboard/articles',
+                icon: FileText
             },
             {
                 name: 'Social Media',

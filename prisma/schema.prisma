@@ -22,6 +22,7 @@ model User {
   projects      Project[]
   skills        Skill[]
   socials       Social[]
+  articles    Article[]
   profile       Profile?
 
   @@index([email])
@@ -90,4 +91,28 @@ model Social {
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+model Article {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique // URL-friendly version of title
+  content     String    // @db.Text // Using Text for long content
+  excerpt     String?   // Optional short description
+  coverImage  String?   // Path to cover image
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  
+  // Relations
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Indexes for better query performance
+  @@index([userId])
+  @@index([slug])
+  @@index([published])
+  @@index([publishedAt])
 }

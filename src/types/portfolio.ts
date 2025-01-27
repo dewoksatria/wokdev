@@ -74,11 +74,11 @@ export interface ExperienceFormData {
 export interface ProjectFormData {
     title: string;
     description?: string;
-    image?: string;
+    image: File | null;
     link?: string;
     githubUrl?: string;
     startDate: string;
-    endDate?: string;
+    endDate: string;
     technologies: string[];
 }
 
@@ -99,4 +99,41 @@ export interface ProfileFormData {
     location?: string;
     website?: string;
     avatar?: string;
+}
+
+export interface Article {
+    id: string;
+    title: string;
+    slug: string;
+    content: string;
+    excerpt?: string | null;
+    coverImage?: string | null;
+    published: boolean;
+    publishedAt?: Date | null;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    user?: {
+        name: string;
+        profile?: {
+            avatar: string | null;
+        } | null;
+    };
+}
+
+export interface ArticleFormData {
+    title: string;
+    content: string;
+    excerpt?: string;
+    coverImage: File | null;
+    published: boolean;
+}
+
+// Response types
+export interface ArticleResponse {
+    article: Article;
+}
+
+export interface ArticlesResponse {
+    articles: Article[];
 }

@@ -43,11 +43,13 @@ body {
   input[type='url'],
   input[type='email'],
   input[type='password'],
+  select,
   textarea {
     @apply form-input-base !text-gray-800;
   }
 
   input::placeholder,
+  select::placeholder,
   textarea::placeholder {
     @apply !text-gray-500;
   }
