@@ -36,6 +36,25 @@ body {
     @apply w-full rounded-md border-gray-300 shadow-sm text-gray-800;
     @apply focus:border-indigo-500 focus:ring-indigo-500;
   }
+
+  /* Skills Component Styles */
+  .skill-card {
+    @apply border border-green-500/20 rounded bg-black/50 overflow-hidden backdrop-blur-sm;
+    animation: slideInFromRight 0.5s ease-out forwards;
+  }
+
+  .skill-level-bar {
+    @apply h-1.5 w-4 rounded-full transition-all duration-300;
+  }
+
+  .skill-progress-bar {
+    @apply relative h-1 bg-green-500/20 rounded-full overflow-hidden;
+  }
+
+  .skill-progress-fill {
+    @apply absolute top-0 left-0 h-full bg-green-500 rounded-full;
+    animation: progressPulse 2s ease-in-out infinite;
+  }
 }
 
 @layer base {
@@ -81,3 +100,245 @@ html {
     scroll-snap-align: start;
   }
 }
+
+/* Animation Keyframes */
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes progressPulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Animation Classes */
+.animate-slideIn {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+.animate-slideInFromRight {
+  animation: slideInFromRight 0.5s ease-out forwards;
+}
+
+.animate-progressPulse {
+  animation: progressPulse 2s ease-in-out infinite;
+}
+
+/* Terminal Container & Layout */
+.terminal-container {
+  @apply border border-green-500/30 bg-black/95 rounded-lg overflow-hidden relative;
+}
+
+/* Terminal Header */
+.terminal-header {
+  @apply flex items-center justify-between p-2 border-b border-green-500/30;
+  background-color: rgba(0, 0, 0, 0.95);
+}
+
+/* Terminal Dots */
+.terminal-dots {
+  @apply flex space-x-1.5;
+}
+
+.terminal-dot {
+  @apply w-2.5 h-2.5 rounded-full;
+}
+
+.terminal-dot-red {
+  @apply bg-red-500/80;
+}
+
+.terminal-dot-yellow {
+  @apply bg-yellow-500/80;
+}
+
+.terminal-dot-green {
+  @apply bg-green-500/80;
+}
+
+/* Navigation Buttons */
+.nav-button {
+  @apply w-6 h-6 flex items-center justify-center rounded;
+  @apply text-green-400/60 hover:text-green-400;
+  @apply hover:bg-green-500/10 transition-colors;
+}
+
+/* Terminal Content */
+.terminal-content {
+  @apply p-6 relative;
+  min-height: 140px;
+}
+
+/* Terminal Footer */
+.terminal-footer {
+  @apply border-t border-green-500/30 bg-black/30;
+}
+
+/* Category Label */
+.category-label {
+  @apply text-sm font-mono text-green-400/60;
+}
+
+/* Skill Content */
+.skill-content {
+  @apply space-y-4;
+}
+
+/* Terminal Command Line */
+.terminal-line {
+  @apply flex items-center space-x-2 text-green-400/80;
+}
+
+/* Skill Level Indicators */
+.skill-level-dot {
+  @apply w-2 h-2 rounded-full transition-colors duration-300;
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.skill-level-dot.active {
+  background: rgba(34, 197, 94, 0.8);
+}
+
+/* Progress Indicators */
+.progress-dots {
+  @apply flex justify-center space-x-1;
+}
+
+.progress-dot {
+  @apply w-1 h-1 rounded-full transition-colors duration-300;
+}
+
+.progress-dot-active {
+  @apply bg-green-500;
+}
+
+.progress-dot-inactive {
+  @apply bg-green-500/20;
+}
+
+/* Skill Info Section */
+.skill-info {
+  @apply space-y-4;
+}
+
+.skill-name {
+  @apply text-lg font-bold text-green-400;
+}
+
+.skill-level {
+  @apply text-sm text-green-400/80 font-mono;
+}
+
+/* Animation Keyframes */
+@keyframes slideChange {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animation Classes */
+.skill-slide {
+  @apply transition-all duration-500;
+}
+
+.skill-slide.transitioning {
+  animation: slideChange 0.5s ease;
+}
+
+/* Extra Terminal Effects */
+.terminal-scanline {
+  @apply absolute inset-0 pointer-events-none;
+  background: linear-gradient(
+    transparent 50%,
+    rgba(34, 197, 94, 0.025) 50%
+  );
+  background-size: 100% 4px;
+  background-repeat: repeat;
+}
+
+/* Terminal Scrollbar */
+.terminal-container ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.terminal-container ::-webkit-scrollbar-track {
+  @apply bg-black/50;
+}
+
+.terminal-container ::-webkit-scrollbar-thumb {
+  @apply bg-green-500/30 rounded;
+}
+
+.terminal-container ::-webkit-scrollbar-thumb:hover {
+  @apply bg-green-500/50;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+  .terminal-content {
+    @apply p-4;
+    min-height: 120px;
+  }
+
+  .nav-button {
+    @apply w-5 h-5;
+  }
+
+  .terminal-dot {
+    @apply w-2 h-2;
+  }
+}
+
+/* Utility Classes for Terminal Theme */
+.terminal-text {
+  @apply font-mono text-green-400;
+}
+
+.terminal-text-dim {
+  @apply font-mono text-green-400/60;
+}
+
+.terminal-border {
+  @apply border-green-500/30;
+}
+
+.terminal-bg {
+  @apply bg-black/95;
+}
+
+.terminal-hover {
+  @apply hover:bg-green-500/10 hover:text-green-400 transition-colors;
+}
+

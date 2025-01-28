@@ -1,4 +1,4 @@
-// src/components/layout/navbar.tsx
+// src/components/layouts/navbar.tsx
 'use client'
 
 import Link from 'next/link'

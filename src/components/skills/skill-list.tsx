@@ -1,4 +1,4 @@
-// src/components/skill-list.tsx
+// src/components/skills/skill-list.tsx
 'use client'
 
 import { useState, useEffect } from 'react'

@@ -4,6 +4,7 @@ import ArticleContent from '@/components/article/article-content';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import type { Article } from '@/types';
+import HackerLayout from '@/components/layouts/hacker-layout';
 
 interface ArticleDetailProps {
     params: {
@@ -31,14 +32,22 @@ export default async function ArticleDetailPage({ params }: ArticleDetailProps) 
     }) as Article | null;
 
     if (!article) {
+        const headerContent = (
+            <Link 
+                href="/blog" 
+                className="inline-flex items-center space-x-2 text-green-400/80 hover:text-green-400"
+            >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to articles</span>
+            </Link>
+        );
+
         return (
-            <div className="min-h-screen bg-black text-green-500 font-mono p-4">
-                <p>&gt; Article not found</p>
-                <Link href="/blog" className="inline-flex items-center space-x-2 mt-4 text-green-400/80 hover:text-green-400">
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>Back to articles</span>
-                </Link>
-            </div>
+            <HackerLayout headerContent={headerContent}>
+                <div className="p-4">
+                    <p className="text-xl">&gt; Article not found</p>
+                </div>
+            </HackerLayout>
         );
     }
 

@@ -4,8 +4,9 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Terminal, ChevronRight } from 'lucide-react';
+import { Terminal, ChevronRight, ArrowLeft } from 'lucide-react';
 import type { Article } from '@/types';
+import HackerLayout from '@/components/layouts/hacker-layout';
 
 export default function BlogPage() {
     const [articles, setArticles] = useState<Article[]>([]);
@@ -39,65 +40,73 @@ export default function BlogPage() {
         );
     }
 
-    return (
-        <main className="min-h-screen bg-black text-green-500 font-mono">
-            <div className="max-w-4xl mx-auto px-4 py-12 sm:px-6">
-                {/* Header */}
-                <div className="mb-12">
-                    <div className="flex items-center space-x-2 mb-4">
-                        <Terminal className="w-5 h-5" />
-                        <h1 className="text-2xl font-bold">&gt; ./list-articles.sh</h1>
-                    </div>
-                    <p className="text-green-400/80">Browse through my technical writings and insights.</p>
-                </div>
+    const headerContent = (
+        <Link 
+            href="/" 
+            className="inline-flex items-center space-x-2 text-green-400/80 hover:text-green-400"
+        >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Portfolio</span>
+        </Link>
+    );
 
-                {/* Articles Grid */}
-                <div className="grid gap-8 md:grid-cols-2">
-                    {articles.map((article) => (
-                        <Link
-                            key={article.id}
-                            href={`/blog/${article.slug}`}
-                            className="block border border-green-500/30 rounded-lg overflow-hidden hover:border-green-500/60 transition-all"
-                        >
-                            {article.coverImage ? (
-                                <div className="relative h-48">
-                                    <Image
-                                        src={article.coverImage}
-                                        alt={article.title}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                                </div>
-                            ) : (
-                                <div className="h-48 bg-green-900/20 flex items-center justify-center">
-                                    <Terminal className="w-12 h-12 text-green-500/40" />
-                                </div>
+    return (
+        <HackerLayout headerContent={headerContent}>
+            {/* Header */}
+            <div className="mb-12">
+                <div className="flex items-center space-x-2 mb-4">
+                    <Terminal className="w-5 h-5" />
+                    <h1 className="text-2xl font-bold">&gt; ./list-articles.sh</h1>
+                </div>
+                <p className="text-green-400/80">Browse through my technical writings and insights.</p>
+            </div>
+
+            {/* Articles Grid */}
+            <div className="grid gap-8 md:grid-cols-2">
+                {articles.map((article) => (
+                    <Link
+                        key={article.id}
+                        href={`/blog/${article.slug}`}
+                        className="block border border-green-500/30 rounded-lg overflow-hidden hover:border-green-500/60 transition-all"
+                    >
+                        {article.coverImage ? (
+                            <div className="relative h-48">
+                                <Image
+                                    src={article.coverImage}
+                                    alt={article.title}
+                                    fill
+                                    className="object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                            </div>
+                        ) : (
+                            <div className="h-48 bg-green-900/20 flex items-center justify-center">
+                                <Terminal className="w-12 h-12 text-green-500/40" />
+                            </div>
+                        )}
+
+                        <div className="p-6 space-y-4">
+                            <div className="text-sm text-green-400/60">
+                                {article.publishedAt && new Date(article.publishedAt).toLocaleDateString('en-US', {
+                                    month: 'long',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                })}
+                            </div>
+
+                            <h2 className="text-xl font-bold text-green-400">{article.title}</h2>
+                            {article.excerpt && (
+                                <p className="text-green-400/80 line-clamp-3">{article.excerpt}</p>
                             )}
 
-                            <div className="p-6 space-y-4">
-                                <div className="text-sm text-green-400/60">
-                                    {article.publishedAt && new Date(article.publishedAt).toLocaleDateString('en-US', {
-                                        month: 'long',
-                                        day: 'numeric',
-                                        year: 'numeric'
-                                    })}
-                                </div>
-
-                                <h2 className="text-xl font-bold text-green-400">{article.title}</h2>
-                                {article.excerpt && (
-                                    <p className="text-green-400/80 line-clamp-3">{article.excerpt}</p>
-                                )}
-
-                                <div className="inline-flex items-center space-x-2 text-green-400/80 hover:text-green-400">
-                                    <span>Read article</span>
-                                    <ChevronRight className="w-4 h-4" />
-                                </div>
+                            <div className="inline-flex items-center space-x-2 text-green-400/80 hover:text-green-400">
+                                <span>Read article</span>
+                                <ChevronRight className="w-4 h-4" />
                             </div>
-                        </Link>
-                    ))}
-                </div>
+                        </div>
+                    </Link>
+                ))}
             </div>
-        </main>
+        </HackerLayout>
     );
 }

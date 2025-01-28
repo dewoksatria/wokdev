@@ -1,4 +1,4 @@
-// src/components/skill-form.tsx
+// src/components/skills/skill-form.tsx
 'use client'
 
 import { useState } from 'react'
