@@ -1,4 +1,4 @@
-// src/components/portfolio/article-list.tsx
+// src/components/article-list.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -17,7 +17,7 @@ export default function ArticleList() {
 
     const fetchArticles = async () => {
         try {
-            const res = await fetch('/api/portfolio/article')
+            const res = await fetch('/api/articles')
             if (!res.ok) throw new Error('Failed to fetch articles')
             const data = await res.json()
             setArticles(data.articles)
@@ -33,7 +33,7 @@ export default function ArticleList() {
         if (!confirm('Apakah Anda yakin ingin menghapus artikel ini?')) return
 
         try {
-            const res = await fetch('/api/portfolio/article', {
+            const res = await fetch('/api/articles', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id }),

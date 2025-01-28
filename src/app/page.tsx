@@ -4,23 +4,9 @@
 import React, { useEffect, useState } from 'react';
 import { ExternalLink, Mail, Terminal, MapPin, Briefcase, Link2, Github, Code, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import type { User, Experience, Project, Skill, Profile } from '@/types';
+import type { PortfolioData } from '@/types';
 import ImageModal from '@/components/ui/ImageModal';
 
-interface Social {
-  id: string;
-  platform: string;
-  url: string;
-}
-
-interface PortfolioData {
-  user: User;
-  profile: Profile | null;
-  experiences: Experience[];
-  projects: Project[];
-  skills: Skill[];
-  socials?: Social[]; // Tambahkan ini
-}
 
 const useTypingEffect = (text: string, speed = 50) => {
   const [displayText, setDisplayText] = useState('');
@@ -53,6 +39,28 @@ export default function HackerPortfolio() {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+
+  const ProjectTechnologies = ({ technologies }: { technologies: string }) => {
+    try {
+      const techArray = JSON.parse(technologies);
+      return (
+        <div className="flex flex-wrap gap-2">
+          {techArray.map((tech: string, index: number) => (
+            <span
+              key={index}
+              className="px-2 py-1 text-xs border border-green-500/30 rounded-full text-green-400/80"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      );
+    } catch (error) {
+      console.error('Error parsing technologies:', error);
+      return null;
     }
   };
 
@@ -290,19 +298,6 @@ export default function HackerPortfolio() {
             </div>
           </section>
 
-          {/* Brands Section */}
-          <section className="space-y-4">
-            <h2 className="text-xl font-bold mb-4">&gt; ./list-brands</h2>
-            <p className="text-green-400/80 mb-4">I had the privilege of working with</p>
-            <div className="flex flex-wrap justify-center gap-8">
-              <span className="text-gray-500">Google</span>
-              <span className="text-gray-500">YouTube</span>
-              <span className="text-gray-500">Dribbble</span>
-              <span className="text-gray-500">Facebook</span>
-              <span className="text-gray-500">123done</span>
-            </div>
-          </section>
-
           {/* Projects Section */}
           <section id="projects" className="space-y-6">
             <div className="flex items-center space-x-2 text-green-400/80">
@@ -336,16 +331,8 @@ export default function HackerPortfolio() {
                     <h3 className="text-xl font-bold text-green-400">{project.title}</h3>
                     <p className="text-green-400/80">{project.description}</p>
 
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.map((tech, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 text-xs border border-green-500/30 rounded-full text-green-400/80"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
+                    {/* Gunakan komponen ProjectTechnologies yang baru */}
+                    <ProjectTechnologies technologies={project.technologies} />
 
                     <div className="flex space-x-4 pt-4">
                       {project.link && (
@@ -371,6 +358,64 @@ export default function HackerPortfolio() {
                         </a>
                       )}
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Latest Articles Section */}
+          <section className="space-y-6">
+            <div className="flex items-center space-x-2 text-green-400/80">
+              <Terminal className="w-5 h-5" />
+              <h2 className="text-xl font-bold">./latest-articles.sh</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {data.articles?.map((article) => (
+                <div
+                  key={article.id}
+                  className="border border-green-500/30 rounded-lg overflow-hidden group hover:border-green-500/60 transition-all"
+                >
+                  {article.coverImage ? (
+                    <div className="relative h-48">
+                      <Image
+                        src={article.coverImage}
+                        alt={article.title}
+                        fill
+                        className="object-cover transition-transform group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                    </div>
+                  ) : (
+                    <div className="h-48 bg-green-900/20 flex items-center justify-center">
+                      <Terminal className="w-12 h-12 text-green-500/40" />
+                    </div>
+                  )}
+
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-green-400/60">
+                        {article.publishedAt && new Date(article.publishedAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </div>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-green-400 line-clamp-2">{article.title}</h3>
+                    {article.excerpt && (
+                      <p className="text-green-400/80 text-sm line-clamp-3">{article.excerpt}</p>
+                    )}
+
+                    <a
+                      href={`/blog/${article.slug}`}
+                      className="inline-flex items-center space-x-2 text-green-400/80 hover:text-green-400 text-sm"
+                    >
+                      <span>Read more</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </a>
                   </div>
                 </div>
               ))}

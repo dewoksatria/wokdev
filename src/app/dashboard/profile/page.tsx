@@ -32,7 +32,7 @@ export default function ProfilePage() {
 
     const fetchProfile = async () => {
         try {
-            const res = await fetch('/api/portfolio/profile')
+            const res = await fetch('/api/profile')
             if (!res.ok) throw new Error('Failed to fetch profile')
             const data = await res.json()
             
@@ -69,7 +69,7 @@ export default function ProfilePage() {
         })
 
         try {
-            const res = await fetch('/api/portfolio/profile', {
+            const res = await fetch('/api/profile', {
                 method: 'PUT',
                 body: formDataToSend
             })

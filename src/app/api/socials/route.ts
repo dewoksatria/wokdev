@@ -1,4 +1,4 @@
-// src/app/api/portfolio/experience/route.ts
+// src/app/api/socials/route.ts
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
@@ -6,7 +6,6 @@ import prisma from '@/lib/prisma';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-// GET all experiences
 export async function GET() {
     try {
         const cookieStore = await cookies();
@@ -20,12 +19,12 @@ export async function GET() {
         }
 
         const decoded = jwt.verify(token.value, JWT_SECRET) as { userId: string };
-        const experiences = await prisma.experience.findMany({
+        const socials = await prisma.social.findMany({
             where: { userId: decoded.userId },
-            orderBy: { startDate: 'desc' }
+            orderBy: { platform: 'asc' }
         });
 
-        return NextResponse.json({ experiences });
+        return NextResponse.json({ socials });
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
             return NextResponse.json(
@@ -33,7 +32,7 @@ export async function GET() {
                 { status: 401 }
             );
         }
-        console.error('Get experiences error:', error);
+        console.error('Get socials error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -41,7 +40,6 @@ export async function GET() {
     }
 }
 
-// POST new experience
 export async function POST(req: Request) {
     try {
         const cookieStore = await cookies();
@@ -55,30 +53,35 @@ export async function POST(req: Request) {
         }
 
         const decoded = jwt.verify(token.value, JWT_SECRET) as { userId: string };
-        const { title, company, location, startDate, endDate, current, description } = await req.json();
+        const { platform, url } = await req.json();
 
         // Validate required fields
-        if (!title || !company || !startDate) {
+        if (!platform || !url) {
             return NextResponse.json(
-                { error: 'Title, company, and start date are required' },
+                { error: 'Platform and URL are required' },
                 { status: 400 }
             );
         }
 
-        const experience = await prisma.experience.create({
+        // Validate URL format
+        try {
+            new URL(url);
+        } catch (e) {
+            return NextResponse.json(
+                { error: 'Invalid URL format ' + e },
+                { status: 400 }
+            );
+        }
+
+        const social = await prisma.social.create({
             data: {
-                title,
-                company,
-                location,
-                startDate: new Date(startDate),
-                endDate: endDate ? new Date(endDate) : null,
-                current,
-                description,
+                platform,
+                url,
                 userId: decoded.userId
             }
         });
 
-        return NextResponse.json({ experience }, { status: 201 });
+        return NextResponse.json({ social }, { status: 201 });
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
             return NextResponse.json(
@@ -86,7 +89,7 @@ export async function POST(req: Request) {
                 { status: 401 }
             );
         }
-        console.error('Create experience error:', error);
+        console.error('Create social error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -94,67 +97,6 @@ export async function POST(req: Request) {
     }
 }
 
-// PUT update experience
-export async function PUT(req: Request) {
-    try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get('token');
-
-        if (!token) {
-            return NextResponse.json(
-                { error: 'Not authenticated' },
-                { status: 401 }
-            );
-        }
-
-        const decoded = jwt.verify(token.value, JWT_SECRET) as { userId: string };
-        const { id, title, company, location, startDate, endDate, current, description } = await req.json();
-
-        // Check if experience exists and belongs to user
-        const existingExperience = await prisma.experience.findFirst({
-            where: {
-                id,
-                userId: decoded.userId
-            }
-        });
-
-        if (!existingExperience) {
-            return NextResponse.json(
-                { error: 'Experience not found' },
-                { status: 404 }
-            );
-        }
-
-        const experience = await prisma.experience.update({
-            where: { id },
-            data: {
-                title,
-                company,
-                location,
-                startDate: new Date(startDate),
-                endDate: endDate ? new Date(endDate) : null,
-                current,
-                description
-            }
-        });
-
-        return NextResponse.json({ experience });
-    } catch (error) {
-        if (error instanceof jwt.JsonWebTokenError) {
-            return NextResponse.json(
-                { error: 'Invalid token' },
-                { status: 401 }
-            );
-        }
-        console.error('Update experience error:', error);
-        return NextResponse.json(
-            { error: 'Internal server error' },
-            { status: 500 }
-        );
-    }
-}
-
-// DELETE experience
 export async function DELETE(req: Request) {
     try {
         const cookieStore = await cookies();
@@ -170,27 +112,27 @@ export async function DELETE(req: Request) {
         const decoded = jwt.verify(token.value, JWT_SECRET) as { userId: string };
         const { id } = await req.json();
 
-        // Check if experience exists and belongs to user
-        const existingExperience = await prisma.experience.findFirst({
+        // Check if social exists and belongs to user
+        const existingSocial = await prisma.social.findFirst({
             where: {
                 id,
                 userId: decoded.userId
             }
         });
 
-        if (!existingExperience) {
+        if (!existingSocial) {
             return NextResponse.json(
-                { error: 'Experience not found' },
+                { error: 'Social media link not found' },
                 { status: 404 }
             );
         }
 
-        await prisma.experience.delete({
+        await prisma.social.delete({
             where: { id }
         });
 
         return NextResponse.json(
-            { message: 'Experience deleted successfully' },
+            { message: 'Social media link deleted successfully' },
             { status: 200 }
         );
     } catch (error) {
@@ -200,7 +142,71 @@ export async function DELETE(req: Request) {
                 { status: 401 }
             );
         }
-        console.error('Delete experience error:', error);
+        console.error('Delete social error:', error);
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
+    }
+}
+
+export async function PUT(req: Request) {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token');
+
+        if (!token) {
+            return NextResponse.json(
+                { error: 'Not authenticated' },
+                { status: 401 }
+            );
+        }
+
+        const decoded = jwt.verify(token.value, JWT_SECRET) as { userId: string };
+        const { id, platform, url } = await req.json();
+
+        // Check if social exists and belongs to user
+        const existingSocial = await prisma.social.findFirst({
+            where: {
+                id,
+                userId: decoded.userId
+            }
+        });
+
+        if (!existingSocial) {
+            return NextResponse.json(
+                { error: 'Social media link not found' },
+                { status: 404 }
+            );
+        }
+
+        // Validate URL format
+        try {
+            new URL(url);
+        } catch (e) {
+            return NextResponse.json(
+                { error: 'Invalid URL format ' + e },
+                { status: 400 }
+            );
+        }
+
+        const social = await prisma.social.update({
+            where: { id },
+            data: {
+                platform,
+                url
+            }
+        });
+
+        return NextResponse.json({ social });
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+            return NextResponse.json(
+                { error: 'Invalid token' },
+                { status: 401 }
+            );
+        }
+        console.error('Update social error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

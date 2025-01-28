@@ -2,8 +2,8 @@
 'use client'
 
 import { useState } from 'react'
-import ArticleForm from '@/components/portfolio/article-form'
-import ArticleList from '@/components/portfolio/article-list'
+import ArticleForm from '@/components/article/article-form'
+import ArticleList from '@/components/article/article-list'
 import { Plus } from 'lucide-react'
 
 export default function ArticlesPage() {

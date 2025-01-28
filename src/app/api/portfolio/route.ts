@@ -7,7 +7,7 @@ export async function GET() {
         // Ambil user pertama sebagai default untuk halaman portfolio
         const user = await prisma.user.findFirst({
             where: {
-                role: 'SUPER_ADMIN' // atau kriteria lain
+                role: 'SUPER_ADMIN'
             },
             select: {
                 id: true,
@@ -28,6 +28,15 @@ export async function GET() {
                     orderBy: {
                         category: 'asc'
                     }
+                },
+                articles: {
+                    where: {
+                        published: true
+                    },
+                    orderBy: {
+                        publishedAt: 'desc'
+                    },
+                    take: 3 // Ambil 3 artikel terbaru
                 }
             }
         });
@@ -48,7 +57,8 @@ export async function GET() {
             profile: user.profile,
             experiences: user.experiences,
             projects: user.projects,
-            skills: user.skills
+            skills: user.skills,
+            articles: user.articles
         });
     } catch (error) {
         console.error('Get portfolio error:', error);

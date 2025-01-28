@@ -2,8 +2,8 @@
 'use client'
 
 import { useState } from 'react'
-import ExperienceForm from '@/components/portfolio/experience-form'
-import ExperienceList from '@/components/portfolio/experience-list'
+import ExperienceForm from '@/components/experience/experience-form'
+import ExperienceList from '@/components/experience/experience-list'
 import { Plus } from 'lucide-react'
 
 export default function ExperiencesPage() {

@@ -1,4 +1,4 @@
-// src/app/api/portfolio/project/route.ts
+// src/app/api/project/route.ts
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';

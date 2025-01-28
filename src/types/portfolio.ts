@@ -1,4 +1,5 @@
 // src/types/portfolio.ts
+import { User } from "./user";
 export interface Experience {
     id: string;
     title: string;
@@ -23,7 +24,7 @@ export interface Project {
     githubUrl?: string | null;
     startDate: Date;
     endDate?: Date | null;
-    technologies: string[];
+    technologies: string;
     userId: string;
     createdAt: Date;
     updatedAt: Date;
@@ -106,19 +107,19 @@ export interface Article {
     title: string;
     slug: string;
     content: string;
-    excerpt?: string | null;
-    coverImage?: string | null;
+    excerpt: string | null;
+    coverImage: string | null;
     published: boolean;
-    publishedAt?: Date | null;
+    publishedAt: Date | null;
     userId: string;
     createdAt: Date;
     updatedAt: Date;
     user?: {
-        name: string;
+        name: string | null;
         profile?: {
             avatar: string | null;
         } | null;
-    };
+    } | null;
 }
 
 export interface ArticleFormData {
@@ -136,4 +137,15 @@ export interface ArticleResponse {
 
 export interface ArticlesResponse {
     articles: Article[];
+}
+
+
+export interface PortfolioData {
+    user: User;
+    profile: Profile | null;
+    experiences: Experience[];
+    projects: Project[];
+    skills: Skill[];
+    socials?: Social[]; // Tambahkan ini
+    articles?: Article[];
 }

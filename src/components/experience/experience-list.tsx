@@ -24,7 +24,7 @@ const ExperienceList = () => {
 
     const fetchExperiences = async () => {
         try {
-            const res = await fetch('/api/portfolio/experience');
+            const res = await fetch('/api/experiences');
             if (!res.ok) throw new Error('Failed to fetch experiences');
             const data = await res.json();
             setExperiences(data.experiences);
@@ -40,7 +40,7 @@ const ExperienceList = () => {
         if (!confirm('Apakah Anda yakin ingin menghapus pengalaman ini?')) return;
 
         try {
-            const res = await fetch('/api/portfolio/experience', {
+            const res = await fetch('/api/experiences', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id }),

@@ -1,4 +1,4 @@
-// src/components/portfolio/project-form.tsx
+// src/components/project-form.tsx
 'use client'
 
 import { useState } from 'react'
@@ -66,7 +66,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                 }
             })
 
-            const res = await fetch('/api/portfolio/project', {
+            const res = await fetch('/api/projects', {
                 method: 'POST',
                 body: formDataToSend,
             })

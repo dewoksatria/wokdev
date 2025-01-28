@@ -1,4 +1,4 @@
-// src/components/portfolio/skill-form.tsx
+// src/components/skill-form.tsx
 'use client'
 
 import { useState } from 'react'
@@ -49,7 +49,7 @@ export default function SkillForm({ onSuccess, initialData, isEdit = false }: Sk
         setIsLoading(true)
 
         try {
-            const url = '/api/portfolio/skill'
+            const url = '/api/skills'
             const method = isEdit ? 'PUT' : 'POST'
             const body = isEdit ? { ...formData, id: initialData?.id } : formData
 

@@ -1,4 +1,4 @@
-// src/components/portfolio/social-form.tsx
+// src/components/social-form.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react';
@@ -42,7 +42,7 @@ export default function SocialForm() {
 
     const fetchSocials = async () => {
         try {
-            const res = await fetch('/api/portfolio/socials');
+            const res = await fetch('/api/socials');
             if (!res.ok) throw new Error('Failed to fetch socials');
             const data = await res.json();
             setSocials(data.socials);
@@ -59,7 +59,7 @@ export default function SocialForm() {
         setSuccess('');
 
         try {
-            const res = await fetch('/api/portfolio/socials', {
+            const res = await fetch('/api/socials', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export default function SocialForm() {
         if (!confirm('Are you sure you want to delete this social media link?')) return;
 
         try {
-            const res = await fetch(`/api/portfolio/socials`, {
+            const res = await fetch(`/api/socials`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

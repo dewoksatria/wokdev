@@ -45,7 +45,7 @@ export default function SocialsPage() {
 
     const fetchSocials = async () => {
         try {
-            const res = await fetch('/api/portfolio/socials')
+            const res = await fetch('/api/socials')
             if (!res.ok) throw new Error('Failed to fetch socials')
             const data = await res.json()
             setSocials(data.socials)
@@ -64,7 +64,7 @@ export default function SocialsPage() {
 
         try {
             const method = isEditing ? 'PUT' : 'POST'
-            const res = await fetch('/api/portfolio/socials', {
+            const res = await fetch('/api/socials', {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ export default function SocialsPage() {
         if (!confirm('Are you sure you want to delete this social media link?')) return
 
         try {
-            const res = await fetch('/api/portfolio/socials', {
+            const res = await fetch('/api/socials', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

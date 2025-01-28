@@ -1,4 +1,4 @@
-// src/components/portfolio/profile-form.tsx
+// src/components/profile-form.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react';
@@ -33,7 +33,7 @@ export default function ProfileForm() {
 
     const fetchProfile = async () => {
         try {
-            const res = await fetch('/api/portfolio/profile');
+            const res = await fetch('/api/profile');
             if (res.ok) {
                 const data = await res.json();
                 if (data.profile) {
@@ -75,7 +75,7 @@ export default function ProfileForm() {
         });
 
         try {
-            const res = await fetch('/api/portfolio/profile', {
+            const res = await fetch('/api/profile', {
                 method: 'PUT',
                 body: formDataToSend,
             });

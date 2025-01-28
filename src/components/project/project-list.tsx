@@ -1,9 +1,30 @@
-// src/components/portfolio/project-list.tsx
+// src/components/project-list.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
 import { Trash2, Edit, Calendar, Link as LinkIcon, Github } from 'lucide-react'
 import type { Project } from '@/types'
+
+const ProjectTechnologies = ({ technologies }: { technologies: string }) => {
+    try {
+        const techArray = JSON.parse(technologies);
+        return (
+            <div className="flex flex-wrap gap-2">
+                {techArray.map((tech: string, index: number) => (
+                    <span
+                        key={index}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
+                    >
+                        {tech}
+                    </span>
+                ))}
+            </div>
+        );
+    } catch (error) {
+        console.error('Error parsing technologies:', error);
+        return null;
+    }
+};
 
 export default function ProjectList() {
     const [projects, setProjects] = useState<Project[]>([])
@@ -16,7 +37,7 @@ export default function ProjectList() {
 
     const fetchProjects = async () => {
         try {
-            const res = await fetch('/api/portfolio/project')
+            const res = await fetch('/api/projects')
             if (!res.ok) throw new Error('Failed to fetch projects')
             const data = await res.json()
             setProjects(data.projects)
@@ -32,7 +53,7 @@ export default function ProjectList() {
         if (!confirm('Apakah Anda yakin ingin menghapus project ini?')) return
 
         try {
-            const res = await fetch('/api/portfolio/project', {
+            const res = await fetch('/api/projects', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id }),
@@ -130,18 +151,9 @@ export default function ProjectList() {
                                     </p>
                                 )}
 
-                                {project.technologies.length > 0 && (
+                                {project.technologies && (
                                     <div className="mt-4">
-                                        <div className="flex flex-wrap gap-2">
-                                            {project.technologies.map((tech, index) => (
-                                                <span
-                                                    key={index}
-                                                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
-                                                >
-                                                    {tech}
-                                                </span>
-                                            ))}
-                                        </div>
+                                        <ProjectTechnologies technologies={project.technologies} />
                                     </div>
                                 )}
                             </div>

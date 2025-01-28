@@ -1,4 +1,4 @@
-// src/components/portfolio/skill-list.tsx
+// src/components/skill-list.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -18,7 +18,7 @@ export default function SkillList() {
 
     const fetchSkills = async () => {
         try {
-            const res = await fetch('/api/portfolio/skill')
+            const res = await fetch('/api/skills')
             if (!res.ok) throw new Error('Failed to fetch skills')
             const data = await res.json()
             setSkills(data.skills)
@@ -34,7 +34,7 @@ export default function SkillList() {
         if (!confirm('Apakah Anda yakin ingin menghapus skill ini?')) return
 
         try {
-            const res = await fetch('/api/portfolio/skill', {
+            const res = await fetch('/api/skills', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id }),

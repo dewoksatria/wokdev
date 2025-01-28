@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import ProjectForm from '@/components/portfolio/project-form'
-import ProjectList from '@/components/portfolio/project-list'
+import ProjectForm from '@/components/project/project-form'
+import ProjectList from '@/components/project/project-list'
 import { Plus } from 'lucide-react'
 
 export default function ProjectsPage() {

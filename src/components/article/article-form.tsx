@@ -1,4 +1,4 @@
-// src/components/portfolio/article-form.tsx
+// src/components/article-form.tsx
 'use client'
 
 import { useState } from 'react'
@@ -70,7 +70,7 @@ export default function ArticleForm({ onSuccess, initialData, isEdit = false }: 
                 formDataToSend.append('id', initialData.id)
             }
 
-            const url = '/api/portfolio/article'
+            const url = '/api/articles'
             const method = isEdit ? 'PUT' : 'POST'
 
             const res = await fetch(url, {

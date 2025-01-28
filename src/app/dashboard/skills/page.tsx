@@ -2,8 +2,8 @@
 'use client'
 
 import { useState } from 'react'
-import SkillForm from '@/components/portfolio/skill-form'
-import SkillList from '@/components/portfolio/skill-list'
+import SkillForm from '@/components/skill/skill-form'
+import SkillList from '@/components/skill/skill-list'
 import { Plus } from 'lucide-react'
 
 export default function ExperiencesPage() {

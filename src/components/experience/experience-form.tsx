@@ -1,4 +1,4 @@
-// src/components/portfolio/experience-form.tsx
+// src/components/experience-form.tsx
 'use client'
 
 import { useState } from 'react'
@@ -38,7 +38,7 @@ export default function ExperienceForm({ onSuccess }: ExperienceFormProps) {
         setIsLoading(true)
 
         try {
-            const res = await fetch('/api/portfolio/experience', {
+            const res = await fetch('/api/experiences', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
