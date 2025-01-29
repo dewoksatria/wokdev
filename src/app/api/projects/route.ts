@@ -34,13 +34,8 @@ export async function GET() {
             orderBy: { startDate: 'desc' }
         });
 
-        // Parse technologies string back to array
-        const formattedProjects = projects.map(project => ({
-            ...project,
-            technologies: JSON.parse(project.technologies)
-        }));
-
-        return NextResponse.json({ projects: formattedProjects });
+        // Return projects directly without parsing technologies
+        return NextResponse.json({ projects });
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
             return NextResponse.json(
@@ -55,6 +50,7 @@ export async function GET() {
         );
     }
 }
+
 
 // POST new project
 export async function POST(req: Request) {
@@ -79,7 +75,7 @@ export async function POST(req: Request) {
         const githubUrl = formData.get('githubUrl') as string;
         const startDate = formData.get('startDate') as string;
         const endDate = formData.get('endDate') as string;
-        const technologies = JSON.parse(formData.get('technologies') as string);
+        const technologies = formData.get('technologies') as string;
         const image = formData.get('image') as unknown as BlobPart | null;
 
         let imagePath: string | undefined = undefined;
@@ -153,7 +149,7 @@ export async function PUT(req: Request) {
         const githubUrl = formData.get('githubUrl') as string;
         const startDate = formData.get('startDate') as string;
         const endDate = formData.get('endDate') as string;
-        const technologies = JSON.parse(formData.get('technologies') as string);
+        const technologies = formData.get('technologies') as string;
         const image = formData.get('image') as unknown as BlobPart | null;
 
         // Check if project exists and belongs to user

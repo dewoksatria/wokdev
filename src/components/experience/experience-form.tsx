@@ -1,4 +1,4 @@
-// src/components/experience-form.tsx
+// src/components/experience/experience-form.tsx
 'use client'
 
 import { useState } from 'react'
@@ -7,17 +7,19 @@ import type { ExperienceFormData } from '@/types'
 
 interface ExperienceFormProps {
     onSuccess?: () => void
+    initialData?: ExperienceFormData & { id?: string }
+    isEdit?: boolean
 }
 
-export default function ExperienceForm({ onSuccess }: ExperienceFormProps) {
+export default function ExperienceForm({ onSuccess, initialData, isEdit = false }: ExperienceFormProps) {
     const [formData, setFormData] = useState<ExperienceFormData>({
-        title: '',
-        company: '',
-        location: '',
-        startDate: '',
-        endDate: '',
-        current: false,
-        description: ''
+        title: initialData?.title || '',
+        company: initialData?.company || '',
+        location: initialData?.location || '',
+        startDate: initialData?.startDate || '',
+        endDate: initialData?.endDate || '',
+        current: initialData?.current || false,
+        description: initialData?.description || ''
     })
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
@@ -29,6 +31,11 @@ export default function ExperienceForm({ onSuccess }: ExperienceFormProps) {
             ...prev,
             [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
         }))
+
+        // Jika checkbox current dicentang, kosongkan endDate
+        if (name === 'current' && (e.target as HTMLInputElement).checked) {
+            setFormData(prev => ({ ...prev, endDate: '' }))
+        }
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,25 +45,31 @@ export default function ExperienceForm({ onSuccess }: ExperienceFormProps) {
         setIsLoading(true)
 
         try {
-            const res = await fetch('/api/experiences', {
-                method: 'POST',
+            const url = '/api/experiences'
+            const method = isEdit ? 'PUT' : 'POST'
+            const body = isEdit ? { ...formData, id: initialData?.id } : formData
+
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(body),
             })
 
             const data = await res.json()
 
             if (res.ok) {
-                setSuccess('Pengalaman kerja berhasil ditambahkan')
-                setFormData({
-                    title: '',
-                    company: '',
-                    location: '',
-                    startDate: '',
-                    endDate: '',
-                    current: false,
-                    description: ''
-                })
+                setSuccess(isEdit ? 'Pengalaman kerja berhasil diperbarui' : 'Pengalaman kerja berhasil ditambahkan')
+                if (!isEdit) {
+                    setFormData({
+                        title: '',
+                        company: '',
+                        location: '',
+                        startDate: '',
+                        endDate: '',
+                        current: false,
+                        description: ''
+                    })
+                }
                 onSuccess?.()
             } else {
                 setError(data.error)
@@ -73,10 +86,11 @@ export default function ExperienceForm({ onSuccess }: ExperienceFormProps) {
         <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
                 <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                    Tambah Pengalaman Kerja
+                    {isEdit ? 'Edit Pengalaman Kerja' : 'Tambah Pengalaman Kerja'}
                 </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Error and Success Messages */}
                     {error && (
                         <div className="bg-red-50 p-4 rounded-md">
                             <p className="text-sm text-red-700">{error}</p>
@@ -89,6 +103,7 @@ export default function ExperienceForm({ onSuccess }: ExperienceFormProps) {
                         </div>
                     )}
 
+                    {/* Form Fields */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
                             Posisi
@@ -214,7 +229,7 @@ export default function ExperienceForm({ onSuccess }: ExperienceFormProps) {
                             disabled={isLoading}
                             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                         >
-                            {isLoading ? 'Menyimpan...' : 'Simpan'}
+                            {isLoading ? 'Menyimpan...' : isEdit ? 'Update' : 'Simpan'}
                         </button>
                     </div>
                 </form>

@@ -8,7 +8,10 @@ import type { ArticleFormData } from '@/types'
 
 interface ArticleFormProps {
     onSuccess?: () => void
-    initialData?: ArticleFormData & { id?: string, coverImage?: string }
+    initialData?: ArticleFormData & {
+        id?: string
+        imageUrl?: string
+    }
     isEdit?: boolean
 }
 
@@ -18,9 +21,10 @@ export default function ArticleForm({ onSuccess, initialData, isEdit = false }: 
         content: initialData?.content || '',
         excerpt: initialData?.excerpt || '',
         published: initialData?.published || false,
-        coverImage: null
+        coverImage: null // File object will be set when user selects new image
     })
-    const [previewUrl, setPreviewUrl] = useState<string>(initialData?.coverImage || '') // Store URL string
+    
+    const [previewUrl, setPreviewUrl] = useState<string>(initialData?.imageUrl || '')
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
     const [isLoading, setIsLoading] = useState(false)

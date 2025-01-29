@@ -1,15 +1,17 @@
-// src/components/article-list.tsx
+// src/components/article/article-list.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
 import { Trash2, Edit, Eye, Calendar, Clock } from 'lucide-react'
 import Image from 'next/image'
 import type { Article } from '@/types'
+import ArticleForm from './article-form'
 
 export default function ArticleList() {
     const [articles, setArticles] = useState<Article[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState('')
+    const [editingArticle, setEditingArticle] = useState<Article | null>(null)
 
     useEffect(() => {
         fetchArticles()
@@ -73,6 +75,32 @@ export default function ArticleList() {
             </div>
         )
     }
+
+    if (editingArticle) {
+        const formInitialData = {
+            title: editingArticle.title,
+            content: editingArticle.content,
+            excerpt: editingArticle.excerpt || '',
+            published: editingArticle.published,
+            coverImage: null,
+        }
+
+        const formProps = {
+            initialData: {
+                ...formInitialData,
+                id: editingArticle.id,
+                imageUrl: editingArticle.coverImage || '',
+            },
+            isEdit: true,
+            onSuccess: () => {
+                setEditingArticle(null)
+                fetchArticles()
+            }
+        }
+
+        return <ArticleForm {...formProps} />
+    }
+
 
     return (
         <div className="space-y-6">
@@ -142,7 +170,7 @@ export default function ArticleList() {
                                         <Eye className="h-5 w-5" />
                                     </a>
                                     <button
-                                        onClick={() => {/* Handle edit */ }}
+                                        onClick={() => setEditingArticle(article)}
                                         className="p-2 text-gray-400 hover:text-indigo-600 rounded-full hover:bg-indigo-50 transition-colors"
                                         title="Edit"
                                     >

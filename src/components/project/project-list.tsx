@@ -1,13 +1,14 @@
-// src/components/project-list.tsx
+// src/components/project/project-list.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
 import { Trash2, Edit, Calendar, Link as LinkIcon, Github } from 'lucide-react'
 import type { Project } from '@/types'
+import ProjectForm from './project-form'
 
 const ProjectTechnologies = ({ technologies }: { technologies: string }) => {
     try {
-        const techArray = JSON.parse(technologies);
+        const techArray = JSON.parse(technologies)
         return (
             <div className="flex flex-wrap gap-2">
                 {techArray.map((tech: string, index: number) => (
@@ -19,17 +20,18 @@ const ProjectTechnologies = ({ technologies }: { technologies: string }) => {
                     </span>
                 ))}
             </div>
-        );
+        )
     } catch (error) {
-        console.error('Error parsing technologies:', error);
-        return null;
+        console.error('Error parsing technologies:', error)
+        return null
     }
-};
+}
 
 export default function ProjectList() {
     const [projects, setProjects] = useState<Project[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState('')
+    const [editingProject, setEditingProject] = useState<Project | null>(null)
 
     useEffect(() => {
         fetchProjects()
@@ -94,6 +96,28 @@ export default function ProjectList() {
         )
     }
 
+    if (editingProject) {
+        return (
+            <ProjectForm
+                initialData={{
+                    title: editingProject.title,
+                    description: editingProject.description || '',
+                    image: null, // We can't pass the File object from existing image
+                    link: editingProject.link || '',
+                    githubUrl: editingProject.githubUrl || '',
+                    startDate: new Date(editingProject.startDate).toISOString().split('T')[0],
+                    endDate: editingProject.endDate ? new Date(editingProject.endDate).toISOString().split('T')[0] : '',
+                    technologies: editingProject.technologies,
+                }}
+                isEdit={true}
+                onSuccess={() => {
+                    setEditingProject(null)
+                    fetchProjects()
+                }}
+            />
+        )
+    }
+
     return (
         <div className="space-y-6">
             {projects.map((project) => (
@@ -114,6 +138,17 @@ export default function ProjectList() {
                                                 month: 'long'
                                             })}
                                         </time>
+                                        {project.endDate && (
+                                            <>
+                                                <span className="mx-2">-</span>
+                                                <time dateTime={project.endDate.toString()}>
+                                                    {new Date(project.endDate).toLocaleDateString('id-ID', {
+                                                        year: 'numeric',
+                                                        month: 'long'
+                                                    })}
+                                                </time>
+                                            </>
+                                        )}
                                     </div>
 
                                     {project.link && (
@@ -161,13 +196,15 @@ export default function ProjectList() {
                             <div className="ml-4 flex-shrink-0 space-x-2">
                                 <button
                                     className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
-                                    onClick={() => {/* Handle edit */ }}
+                                    onClick={() => setEditingProject(project)}
+                                    title="Edit"
                                 >
                                     <Edit className="h-5 w-5" />
                                 </button>
                                 <button
                                     className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
                                     onClick={() => handleDelete(project.id)}
+                                    title="Hapus"
                                 >
                                     <Trash2 className="h-5 w-5" />
                                 </button>

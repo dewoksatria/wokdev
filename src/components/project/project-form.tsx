@@ -1,30 +1,32 @@
-// src/components/project-form.tsx
+// src/components/project/project-form.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Calendar, Link2, Upload } from 'lucide-react'
 import type { ProjectFormData } from '@/types'
 import Image from 'next/image'
 
 interface ProjectFormProps {
     onSuccess?: () => void
+    initialData?: (ProjectFormData & { id?: string, imageUrl?: string })
+    isEdit?: boolean
 }
 
-export default function ProjectForm({ onSuccess }: ProjectFormProps) {
+export default function ProjectForm({ onSuccess, initialData, isEdit = false }: ProjectFormProps) {
     const [formData, setFormData] = useState<ProjectFormData>({
-        title: '',
-        description: '',
+        title: initialData?.title || '',
+        description: initialData?.description || '',
         image: null,
-        link: '',
-        githubUrl: '',
-        startDate: '',
-        endDate: '',
-        technologies: [],
+        link: initialData?.link || '',
+        githubUrl: initialData?.githubUrl || '',
+        startDate: initialData?.startDate || '',
+        endDate: initialData?.endDate || '',
+        technologies: initialData?.technologies || '[]' // Initialize as JSON string
     })
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const [preview, setPreview] = useState<string>('')
+    const [preview, setPreview] = useState<string>(initialData?.imageUrl || '')
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
@@ -42,12 +44,31 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
         }
     }
 
+    useEffect(() => {
+        return () => {
+            if (preview && !preview.includes('/')) {
+                URL.revokeObjectURL(preview)
+            }
+        }
+    }, [preview])
+
     const handleTechnologies = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const technologies = e.target.value.split(',').map(tech => tech.trim())
+        // Convert comma-separated string to JSON string array
+        const techArray = e.target.value.split(',').map(tech => tech.trim()).filter(Boolean)
         setFormData(prev => ({
             ...prev,
-            technologies
+            technologies: JSON.stringify(techArray)
         }))
+    }
+
+    const getTechnologiesString = () => {
+        try {
+            // Parse the JSON string to array and join with commas
+            const techArray = JSON.parse(formData.technologies)
+            return Array.isArray(techArray) ? techArray.join(', ') : ''
+        } catch {
+            return ''
+        }
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -58,34 +79,41 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
 
         try {
             const formDataToSend = new FormData()
+            
+            // Add ID if editing
+            if (isEdit && initialData?.id) {
+                formDataToSend.append('id', initialData.id)
+            }
+
+            // Append other form data
             Object.entries(formData).forEach(([key, value]) => {
-                if (key === 'technologies') {
-                    formDataToSend.append(key, JSON.stringify(value))
-                } else if (value !== null && value !== '') {
+                if (value !== null && value !== '') {
                     formDataToSend.append(key, value)
                 }
             })
 
             const res = await fetch('/api/projects', {
-                method: 'POST',
+                method: isEdit ? 'PUT' : 'POST',
                 body: formDataToSend,
             })
 
             const data = await res.json()
 
             if (res.ok) {
-                setSuccess('Project berhasil ditambahkan')
-                setFormData({
-                    title: '',
-                    description: '',
-                    image: null,
-                    link: '',
-                    githubUrl: '',
-                    startDate: '',
-                    endDate: '',
-                    technologies: [],
-                })
-                setPreview('')
+                setSuccess(isEdit ? 'Project berhasil diperbarui' : 'Project berhasil ditambahkan')
+                if (!isEdit) {
+                    setFormData({
+                        title: '',
+                        description: '',
+                        image: null,
+                        link: '',
+                        githubUrl: '',
+                        startDate: '',
+                        endDate: '',
+                        technologies: '[]'
+                    })
+                    setPreview('')
+                }
                 onSuccess?.()
             } else {
                 setError(data.error)
@@ -102,7 +130,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
         <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
                 <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                    Tambah Project Baru
+                    {isEdit ? 'Edit Project' : 'Tambah Project Baru'}
                 </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -151,6 +179,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                         </div>
                     </div>
 
+                    {/* Title */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
                             Judul Project
@@ -165,6 +194,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                         />
                     </div>
 
+                    {/* Description */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
                             Deskripsi
@@ -178,6 +208,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                         />
                     </div>
 
+                    {/* URLs */}
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">
@@ -216,44 +247,48 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Tanggal Mulai
-                        </label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input
-                                type="date"
-                                name="startDate"
-                                value={formData.startDate}
-                                onChange={handleChange}
-                                required
-                                className="block w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            />
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Calendar className="h-4 w-4 text-gray-400" />
+                    {/* Dates */}
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Tanggal Mulai
+                            </label>
+                            <div className="mt-1 relative rounded-md shadow-sm">
+                                <input
+                                    type="date"
+                                    name="startDate"
+                                    value={formData.startDate}
+                                    onChange={handleChange}
+                                    required
+                                    className="block w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                />
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Tanggal Selesai
+                            </label>
+                            <div className="mt-1 relative rounded-md shadow-sm">
+                                <input
+                                    type="date"
+                                    name="endDate"
+                                    value={formData.endDate}
+                                    onChange={handleChange}
+                                    required
+                                    className="block w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                />
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Tanggal Selesai
-                        </label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input
-                                type="date"
-                                name="endDate"
-                                value={formData.endDate}
-                                onChange={handleChange}
-                                required
-                                className="block w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            />
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Calendar className="h-4 w-4 text-gray-400" />
-                            </div>
-                        </div>
-                    </div>
-
+                    {/* Technologies */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
                             Technologies
@@ -261,7 +296,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                         <input
                             type="text"
                             name="technologies"
-                            value={formData.technologies.join(', ')}
+                            value={getTechnologiesString()}
                             onChange={handleTechnologies}
                             placeholder="Contoh: React, Node.js, TypeScript"
                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -271,6 +306,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                         </p>
                     </div>
 
+                    {/* Buttons */}
                     <div className="flex justify-end space-x-3">
                         <button
                             type="button"
@@ -284,7 +320,7 @@ export default function ProjectForm({ onSuccess }: ProjectFormProps) {
                             disabled={isLoading}
                             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                         >
-                            {isLoading ? 'Menyimpan...' : 'Simpan'}
+                            {isLoading ? 'Menyimpan...' : isEdit ? 'Update' : 'Simpan'}
                         </button>
                     </div>
                 </form>

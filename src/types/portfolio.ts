@@ -80,7 +80,7 @@ export interface ProjectFormData {
     githubUrl?: string;
     startDate: string;
     endDate: string;
-    technologies: string[];
+    technologies: string;
 }
 
 export interface SkillFormData {
@@ -126,8 +126,8 @@ export interface ArticleFormData {
     title: string;
     content: string;
     excerpt?: string;
-    coverImage: File | null;
     published: boolean;
+    coverImage: File | null;  // Ubah tipe data ini
 }
 
 // Response types
