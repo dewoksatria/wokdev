@@ -2,12 +2,17 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, Mail, Terminal, MapPin, Briefcase, Link2, Github, ChevronRight } from 'lucide-react';
+import { Mail, Terminal, MapPin, Briefcase, Link2, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import type { PortfolioData } from '@/types';
 import ImageModal from '@/components/ui/ImageModal';
 import HackerLayout from '@/components/layouts/hacker-layout';
 import SkillCarousel from '@/components/skills/SkillCarousel';
+import PortfolioStats from '@/components/portfolio/PortfolioStats';
+import ProjectCarousel from '@/components/project/ProjectCarousel';
+import VerticalExperienceCarousel from '@/components/experience/VerticalExperienceCarousel';
+import ContactForm from '@/components/portfolio/ContactForm';
+import Link from 'next/link';
 
 
 const useTypingEffect = (text: string, speed = 50) => {
@@ -36,27 +41,6 @@ export default function HackerPortfolio() {
   const welcomeText = useTypingEffect('&gt; Initializing system...', 50);
   const accessText = useTypingEffect('&gt; Access granted...', 50);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-
-  const ProjectTechnologies = ({ technologies }: { technologies: string }) => {
-    try {
-      const techArray = JSON.parse(technologies);
-      return (
-        <div className="flex flex-wrap gap-2">
-          {techArray.map((tech: string, index: number) => (
-            <span
-              key={index}
-              className="px-2 py-1 text-xs border border-green-500/30 rounded-full text-green-400/80"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      );
-    } catch (error) {
-      console.error('Error parsing technologies:', error);
-      return null;
-    }
-  };
 
   useEffect(() => {
     async function fetchPortfolioData() {
@@ -178,18 +162,11 @@ export default function HackerPortfolio() {
       </section>
 
       {/* Stats Section - Mobile Optimized */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          { value: "15+", label: "Years of Experience" },
-          { value: "100+", label: "Projects Completed" },
-          { value: "30+", label: "Satisfied Clients" }
-        ].map((stat, index) => (
-          <div key={index} className="border border-green-500/30 p-4 sm:p-6 text-center">
-            <div className="text-xl sm:text-2xl font-bold">{stat.value}</div>
-            <div className="text-xs sm:text-sm text-green-400/80">{stat.label}</div>
-          </div>
-        ))}
-      </section>
+      <PortfolioStats
+        experiences={data.experiences || []}
+        projects={data.projects || []}
+        skills={data.skills || []}
+      />
 
       {/* Skills Section with grouped carousels */}
       <section id="skills" className="space-y-6">
@@ -223,50 +200,7 @@ export default function HackerPortfolio() {
           <h2 className="text-xl font-bold">./list-experience.sh</h2>
         </div>
 
-        <div className="space-y-4">
-          {data.experiences?.map((exp) => (
-            <div
-              key={exp.id}
-              className="border border-green-500/30 p-6 rounded-lg hover:border-green-500/60 transition-all group"
-            >
-              <div className="grid md:grid-cols-[1fr,2fr] gap-6">
-                {/* Left Column - Company Info */}
-                <div>
-                  <h3 className="font-bold text-green-400 text-lg">{exp.company}</h3>
-                  <p className="text-green-400/60">{exp.location}</p>
-                  <p className="text-sm text-green-400/80 mt-2">
-                    {new Date(exp.startDate).toLocaleDateString('en-US', {
-                      month: 'short',
-                      year: 'numeric'
-                    })}
-                    {' - '}
-                    {exp.current ? 'Present' : new Date(exp?.endDate || "").toLocaleDateString('en-US', {
-                      month: 'short',
-                      year: 'numeric'
-                    })}
-                  </p>
-                </div>
-
-                {/* Right Column - Role & Description */}
-                <div>
-                  <h4 className="text-lg font-semibold text-green-400">{exp.title}</h4>
-                  <p className="mt-2 text-green-400/80 whitespace-pre-line">{exp.description}</p>
-                </div>
-              </div>
-
-              {exp.image && (
-                <div className="mt-4 relative h-48 rounded-lg overflow-hidden">
-                  <Image
-                    src={exp.image}
-                    alt={exp.company}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        <VerticalExperienceCarousel experiences={data.experiences || []} />
       </section>
 
       {/* Projects Section */}
@@ -276,70 +210,24 @@ export default function HackerPortfolio() {
           <h2 className="text-xl font-bold">./showcase-projects.sh</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {data.projects?.map((project) => (
-            <div
-              key={project.id}
-              className="border border-green-500/30 rounded-lg overflow-hidden group hover:border-green-500/60 transition-all"
-            >
-              {project.image ? (
-                <div className="relative h-48">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    className="object-cover transition-transform group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                </div>
-              ) : (
-                <div className="h-48 bg-green-900/20 flex items-center justify-center">
-                  <Terminal className="w-12 h-12 text-green-500/40" />
-                </div>
-              )}
-
-              <div className="p-6 space-y-4">
-                <h3 className="text-xl font-bold text-green-400">{project.title}</h3>
-                <p className="text-green-400/80">{project.description}</p>
-
-                {/* Gunakan komponen ProjectTechnologies yang baru */}
-                <ProjectTechnologies technologies={project.technologies} />
-
-                <div className="flex space-x-4 pt-4">
-                  {project.link && (
-                    <a
-                      href={project.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center space-x-2 text-green-400/80 hover:text-green-400"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      <span>Live Demo</span>
-                    </a>
-                  )}
-                  {project.githubUrl && (
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center space-x-2 text-green-400/80 hover:text-green-400"
-                    >
-                      <Github className="w-4 h-4" />
-                      <span>Source Code</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ProjectCarousel projects={data.projects || []} />
       </section>
 
       {/* Latest Articles Section */}
       <section className="space-y-6">
-        <div className="flex items-center space-x-2 text-green-400/80">
-          <Terminal className="w-5 h-5" />
-          <h2 className="text-xl font-bold">./latest-articles.sh</h2>
+        <div className="flex items-center justify-between text-green-400/80">
+          <div className="flex items-center space-x-2">
+            <Terminal className="w-5 h-5" />
+            <h2 className="text-xl font-bold">./latest-articles.sh</h2>
+          </div>
+
+          <Link
+            href="/blog"
+            className="group flex items-center space-x-2 hover:text-green-400 transition-colors"
+          >
+            <span className="text-sm font-mono">&gt; cd /blog</span>
+            <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -354,9 +242,12 @@ export default function HackerPortfolio() {
                     src={article.coverImage}
                     alt={article.title}
                     fill
-                    className="object-cover transition-transform group-hover:scale-105"
+                    className="object-cover transition-transform filter grayscale group-hover:grayscale-0 scale-100 group-hover:scale-105 transition-all duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                  <div
+                    className="absolute inset-0 bg-green-500 mix-blend-color opacity-50 group-hover:opacity-0 transition-opacity duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent scale-100 group-hover:scale-105 transition-all duration-500" />
                 </div>
               ) : (
                 <div className="h-48 bg-green-900/20 flex items-center justify-center">
@@ -400,47 +291,55 @@ export default function HackerPortfolio() {
           <h2 className="text-xl font-bold">./contact-info.sh</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {data.profile?.location && (
-            <div className="border border-green-500/30 p-4 rounded-lg flex items-center space-x-3">
-              <MapPin className="w-5 h-5 text-green-400" />
-              <span>{data.profile.location}</span>
-            </div>
-          )}
-          {data.profile?.website && (
-            <div className="border border-green-500/30 p-4 rounded-lg flex items-center space-x-3">
-              <Link2 className="w-5 h-5 text-green-400" />
-              <a
-                href={data.profile.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-green-400"
-              >
-                {data.profile.website}
-              </a>
-            </div>
-          )}
-          {data.user?.email && (
-            <div className="border border-green-500/30 p-4 rounded-lg flex items-center space-x-3">
-              <Mail className="w-5 h-5 text-green-400" />
-              <a
-                href={`mailto:${data.user.email}`}
-                className="hover:text-green-400"
-              >
-                {data.user.email}
-              </a>
-            </div>
-          )}
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-[1fr,1.5fr] gap-8">
+          {/* Contact Info */}
+          <div className="space-y-4">
+            {data.profile?.location && (
+              <div className="border border-green-500/30 p-4 rounded-lg flex items-center space-x-3">
+                <MapPin className="w-5 h-5 text-green-400" />
+                <span>{data.profile.location}</span>
+              </div>
+            )}
+            {data.profile?.website && (
+              <div className="border border-green-500/30 p-4 rounded-lg flex items-center space-x-3">
+                <Link2 className="w-5 h-5 text-green-400" />
 
-        {/* Image Modal */}
-        <ImageModal
-          src={data.profile?.avatar || '/placeholder.jpg'}
-          alt={data.user?.name || ''}
-          isOpen={isImageModalOpen}
-          onClose={() => setIsImageModalOpen(false)}
-        />
+                <Link href={data.profile.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-green-400">
+                  {data.profile.website}
+                </Link>
+
+
+              </div>
+            )}
+            {data.user?.email && (
+              <div className="border border-green-500/30 p-4 rounded-lg flex items-center space-x-3">
+                <Mail className="w-5 h-5 text-green-400" />
+
+                <Link
+                  href={`mailto:${data.user.email}`}
+                  className="hover:text-green-400"
+                >
+                  {data.user.email}
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Contact Form */}
+          <ContactForm />
+        </div>
       </section>
+
+      {/* Image Modal */}
+      <ImageModal
+        src={data.profile?.avatar || '/placeholder.jpg'}
+        alt={data.user?.name || ''}
+        isOpen={isImageModalOpen}
+        onClose={() => setIsImageModalOpen(false)}
+      />
     </HackerLayout>
   );
 }

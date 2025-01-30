@@ -7,7 +7,7 @@ import { writeFile } from 'fs/promises';
 import { join } from 'path';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const UPLOAD_DIR = join(process.cwd(), 'public/uploads');
+const UPLOAD_DIR = join(process.cwd(), 'public/images/articles');
 
 // Helper to generate slug
 function generateSlug(title: string): string {
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
             const filename = `article-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
             const filepath = join(UPLOAD_DIR, filename);
             await writeFile(filepath, buffer);
-            coverImagePath = `/uploads/${filename}`;
+            coverImagePath = `/images/articles/${filename}`;
         }
 
         const slug = generateSlug(title);
@@ -177,7 +177,7 @@ export async function PUT(req: Request) {
             const filename = `article-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
             const filepath = join(UPLOAD_DIR, filename);
             await writeFile(filepath, buffer);
-            coverImagePath = `/uploads/${filename}`;
+            coverImagePath = `/images/articles/${filename}`;
         }
 
         const updatedArticle = await prisma.article.update({

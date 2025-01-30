@@ -14,7 +14,8 @@ import {
     Settings,
     User,
     Contact,
-    FileText
+    FileText,
+    MessageCircle,
 } from 'lucide-react'
 import type { User as UserType } from '@/types'
 
@@ -50,6 +51,11 @@ const sidebarLinks = [
                 name: 'Social Media',
                 href: '/dashboard/socials',
                 icon: LinkIcon
+            },
+            {
+                name: 'Messages',
+                href: '/dashboard/messages',
+                icon: MessageCircle
             }
         ]
     },

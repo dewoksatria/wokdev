@@ -6,7 +6,7 @@ import { writeFile } from 'fs/promises';
 import { join } from 'path';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const UPLOAD_DIR = join(process.cwd(), 'public/uploads');
+const UPLOAD_DIR = join(process.cwd(), 'public/images/profile');
 
 interface BlobPart {
     arrayBuffer(): Promise<ArrayBuffer>;
@@ -75,7 +75,7 @@ export async function PUT(req: Request) {
             const filename = `avatar-${decoded.userId}-${Date.now()}-${avatar.name || 'image'}`;
             const filepath = join(UPLOAD_DIR, filename);
             await writeFile(filepath, buffer);
-            avatarPath = `/uploads/${filename}`;
+            avatarPath = `/images/profile/${filename}`;
         }
 
         const profile = await prisma.profile.upsert({
